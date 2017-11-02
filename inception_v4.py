@@ -250,6 +250,8 @@ def inception_v4(num_classes, dropout_keep_prob, weights, include_top):
         logits: the logits outputs of the model.
     '''
 
+    defaultNumClasses = 1001
+
     # Input Shape is 299 x 299 x 3 (tf) or 3 x 299 x 299 (th)
     if K.image_data_format() == 'channels_first':
         inputs = Input((3, 299, 299))
@@ -266,7 +268,7 @@ def inception_v4(num_classes, dropout_keep_prob, weights, include_top):
         x = Dropout(dropout_keep_prob)(x)
         x = Flatten()(x)
         # 1536
-        x = Dense(units=num_classes, activation='softmax')(x)
+        x = Dense(units=defaultNumClasses, activation='softmax')(x)
 
     model = Model(inputs, x, name='inception_v4')
 
@@ -295,7 +297,21 @@ def inception_v4(num_classes, dropout_keep_prob, weights, include_top):
                 cache_subdir='models',
                 md5_hash='9296b46b5971573064d12e4669110969')
         model.load_weights(weights_path, by_name=True)
-    return model
+
+        # Remove the last layer while adding back in with the correct class numbers
+        if not include_top and num_classes != defaultNumClasses:
+            # 1 x 1 x 1536
+            newX = AveragePooling2D((8, 8), padding='valid')(model.layers[-1].output)
+            newX = Dropout(dropout_keep_prob)(newX)
+            newX = Flatten()(newX)
+            # 1536
+            newX = Dense(units=num_classes, activation='softmax')(newX)
+
+            inp = model.input
+            newModel = Model(inp, newX, name='inception_v4')
+            return newModel
+        else:
+            return model
 
 
 def create_model(num_classes=1001, dropout_prob=0.2, weights=None, include_top=True):

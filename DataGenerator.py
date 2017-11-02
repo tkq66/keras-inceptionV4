@@ -75,15 +75,14 @@ class DataGenerator:
 
     def __getData(self, order):
         x = []
-        y = []
+        y = to_categorical([self.trainingDataReference[i][1] for i in order],
+                           num_classes=self.num_classes)
         for i in order:
             fileName, label = self.trainingDataReference[i]
             fullFileName = self.IMG_FILE_PATH_ROOT + fileName
             image = self.__get_processed_image(fullFileName)
-            onehotLabel = to_categorical(label, num_classes=self.num_classes)
             x.append(image)
-            y.append(onehotLabel)
-        return np.asarray(x), np.asarray(y)
+        return np.asarray(x), y
 
     def __getDataOrder(self, totalItems):
         indices = np.arange(totalItems)
