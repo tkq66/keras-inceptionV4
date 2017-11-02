@@ -4,6 +4,7 @@ import inception_v4
 from keras import backend as K
 from keras.utils import to_categorical
 import numpy as np
+from ThreadSafe import threadsafe_generator
 
 
 class DataGenerator:
@@ -58,6 +59,7 @@ class DataGenerator:
     def getValidationSize(self):
         return self.totalValidationInput
 
+    @threadsafe_generator
     def generateTrain(self):
         while True:
             if self.shuffle:
@@ -67,6 +69,7 @@ class DataGenerator:
                 x, y = self.__getData(batchOrder)
                 yield tuple((x, y))
 
+    @threadsafe_generator
     def generateValidation(self):
         while True:
             for i in self.validationIndices:

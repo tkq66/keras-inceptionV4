@@ -3,6 +3,9 @@ from keras.callbacks import Callback
 
 class TrainingCallback(Callback):
 
+    def __init__(self, testData):
+        self.testData = testData
+
     def on_epoch_end(self, epoch, logs={}):
         return
 
