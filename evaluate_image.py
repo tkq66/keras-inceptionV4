@@ -17,11 +17,13 @@ limitations under the License.
 """
 
 import DataGenerator as dg
-import TrainingCallback as tc
+from TrainingCallback import BatchEval
 from keras import optimizers
 from keras import losses
+from keras.callbacks import ModelCheckpoint
 import inception_v4
 import csv
+import uuid
 
 
 # If you want to use a GPU set its index here
@@ -61,10 +63,16 @@ def main():
                   metrics=['accuracy'])
 
     # Train the new model
+    batchEval = BatchEval(validationGenerator=dataGenerator.generateValidation,
+                          validationSteps=dataGenerator.getValidationSteps(),
+                          cpuCores=cpuCores)
+    checkpointFileName = "checkpoints/weights_" + str(uuid.uuid4()) + ".hdf5"
+    checkpointer = ModelCheckpoint(filepath=checkpointFileName, verbose=1, save_best_only=True)
     history = model.fit_generator(generator=dataGenerator.generateTrain(),
                                   steps_per_epoch=dataGenerator.getTrainStepsPerEpoch(),
                                   epochs=trainingEpoch,
                                   verbose=1,
+                                  callbacks=[batchEval, checkpointer],
                                   validation_data=dataGenerator.generateValidation(),
                                   validation_steps=dataGenerator.getValidationSteps(),
                                   workers=cpuCores,
