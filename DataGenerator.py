@@ -8,14 +8,15 @@ import numpy as np
 
 class DataGenerator:
 
-    TRAIN_FILE_NAME = '../data/train.csv'
-    IMG_FILE_PATH_ROOT = '../data/transferred_train/'
+    TRAIN_FILE_NAME = '../../data/train_overfit.csv'
+    IMG_FILE_PATH_ROOT = '../../data/transferred_train/'
 
     def __init__(self,
                  validation_split=0.33,
                  num_classes=132,
                  batch_size=32,
-                 shuffle=True):
+                 shuffle=True,
+                 sample=-1):
         self.validation_split = validation_split
         self.num_classes = num_classes
         self.batch_size = batch_size
@@ -29,7 +30,7 @@ class DataGenerator:
             for fileName, label in reader:
                 if int(label) > self.num_classes:
                     raise ValueError("Label is greater than specified number of classes.")
-                self.trainingDataReference.append(tuple(fileName, label))
+                self.trainingDataReference.append(tuple((fileName, label)))
 
         # Pick the indices for the training and validation data set
         totalInput = len(self.trainingDataReference)
@@ -44,8 +45,8 @@ class DataGenerator:
 
         # Calculate the begin and end index for each batch
         self.stepsPerEpoch = int(np.ceil(self.totalTrainInput / self.batch_size))
-        self.trainBatchOrder = (np.repeat(np.arange(self.stepPerEpoch), 2).reshape(-1, 2) * self.batch_size) + \
-                               (np.tile(np.array([0, self.batch_size]), self.stepPerEpoch).reshape(-1, 2))
+        self.trainBatchOrder = (np.repeat(np.arange(self.stepsPerEpoch), 2).reshape(-1, 2) * self.batch_size) + \
+                               (np.tile(np.array([0, self.batch_size]), self.stepsPerEpoch).reshape(-1, 2))
         self.trainBatchOrder[-1, 1] = self.totalTrainInput
 
     def getTrainStepsPerEpoch(self):
@@ -64,13 +65,13 @@ class DataGenerator:
             for begin, end in self.trainBatchOrder:
                 batchOrder = self.trainIndices[begin:end]
                 x, y = self.__getData(batchOrder)
-                yield tuple(x, y)
+                yield tuple((x, y))
 
     def generateValidation(self):
         while True:
             for i in self.validationIndices:
                 x, y = self.__getData([i])
-                yield tuple(x, y)
+                yield tuple((x, y))
 
     def __getData(self, order):
         x = []

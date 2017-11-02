@@ -27,7 +27,7 @@ import csv
 
 # If you want to use a GPU set its index here
 os.environ['CUDA_VISIBLE_DEVICES'] = ''
-trainingLabelFileName = '../data/train.csv'
+trainingLabelFileName = '../../data/train_overfit.csv'
 cpuCores = 4
 trainingEpoch = 1
 batchSize = 32
@@ -71,6 +71,7 @@ def main():
                                   validation_step=dataGenerator.getValidationSize(),
                                   workers=cpuCores,
                                   use_multiprocessing=True)
+    print(history)
 
 
 if __name__ == "__main__":
