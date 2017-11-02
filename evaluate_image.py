@@ -55,7 +55,7 @@ def main():
     # Create model and load pre-trained weights
     model = inception_v4.create_model(num_classes=classes,
                                       weights='imagenet',
-                                      include_top=True)
+                                      include_top=False)
 
     # Configure training hyper-parameters
     model.compile(optimizer=optimizer,
@@ -68,7 +68,7 @@ def main():
                                   epochs=trainingEpoch,
                                   verbose=1,
                                   validation_data=dataGenerator.generateValidation(),
-                                  validation_step=dataGenerator.getValidationSize(),
+                                  validation_steps=dataGenerator.getValidationSize(),
                                   workers=cpuCores,
                                   use_multiprocessing=True)
     print(history)

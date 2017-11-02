@@ -99,9 +99,9 @@ class DataGenerator:
         im = inception_v4.preprocess_input(im)
         if K.image_data_format() == "channels_first":
             im = np.transpose(im, (2, 0, 1))
-            im = im.reshape(-1, 3, 299, 299)
+            im = im.reshape(3, 299, 299)
         else:
-            im = im.reshape(-1, 299, 299, 3)
+            im = im.reshape(299, 299, 3)
         return im
 
     # This function comes from Google's ImageNet Preprocessing Script
