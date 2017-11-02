@@ -21,12 +21,10 @@ import TrainingCallback as tc
 from keras import optimizers
 from keras import losses
 import inception_v4
-import os
 import csv
 
 
 # If you want to use a GPU set its index here
-os.environ['CUDA_VISIBLE_DEVICES'] = ''
 trainingLabelFileName = '../../data/train_overfit.csv'
 cpuCores = 4
 trainingEpoch = 1
@@ -68,7 +66,7 @@ def main():
                                   epochs=trainingEpoch,
                                   verbose=1,
                                   validation_data=dataGenerator.generateValidation(),
-                                  validation_steps=dataGenerator.getValidationSize(),
+                                  validation_steps=dataGenerator.getValidationSteps(),
                                   workers=cpuCores,
                                   use_multiprocessing=True)
     print(history)

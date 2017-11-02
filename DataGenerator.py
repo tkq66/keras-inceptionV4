@@ -44,14 +44,23 @@ class DataGenerator:
         assert len(self.validationIndices) == self.totalValidationInput
         assert len(self.trainIndices) == self.totalTrainInput
 
-        # Calculate the begin and end index for each batch
+        # Calculate the begin and end index for each training batch
         self.stepsPerEpoch = int(np.ceil(self.totalTrainInput / self.batch_size))
         self.trainBatchOrder = (np.repeat(np.arange(self.stepsPerEpoch), 2).reshape(-1, 2) * self.batch_size) + \
                                (np.tile(np.array([0, self.batch_size]), self.stepsPerEpoch).reshape(-1, 2))
         self.trainBatchOrder[-1, 1] = self.totalTrainInput
 
+        # Calculate the begin and end index for each validation batch
+        self.validationSteps = int(np.ceil(self.totalValidationInput / self.batch_size))
+        self.validationBatchOrder = (np.repeat(np.arange(self.validationSteps), 2).reshape(-1, 2) * self.batch_size) + \
+                                    (np.tile(np.array([0, self.batch_size]), self.validationSteps).reshape(-1, 2))
+        self.validationBatchOrder[-1, 1] = self.totalValidationInput
+
     def getTrainStepsPerEpoch(self):
         return self.stepsPerEpoch
+
+    def getValidationSteps(self):
+        return self.validationSteps
 
     def getTrainingSize(self):
         return self.totalTrainInput
@@ -72,8 +81,9 @@ class DataGenerator:
     @threadsafe_generator
     def generateValidation(self):
         while True:
-            for i in self.validationIndices:
-                x, y = self.__getData([i])
+            for begin, end in self.validationBatchOrder:
+                batchOrder = self.validationIndices[begin:end]
+                x, y = self.__getData(batchOrder)
                 yield tuple((x, y))
 
     def __getData(self, order):
