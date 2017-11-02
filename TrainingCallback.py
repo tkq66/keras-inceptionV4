@@ -19,9 +19,10 @@ class BatchEval(Callback):
         return
 
     def on_batch_begin(self, batch, logs={}):
-        return
+        print(f"Batch {batch}: Begin Processing\n")
 
     def on_batch_end(self, batch, logs={}):
+        print(f"Batch {batch}: End Processing\n")
         print(f"Batch {batch}: Begin Evaluation\n")
         loss, acc = self.model.evaluate_generator(generator=self.validationGenerator(),
                                                   steps=self.validationSteps,
