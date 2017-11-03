@@ -18,7 +18,7 @@ limitations under the License.
 
 import csv
 import DataGenerator as dg
-from TrainingCallback import BatchEval, LossHistory
+from TrainingCallback import BatchEval, LossHistory, BatchHistory
 import inception_v4
 import json
 from keras import optimizers
@@ -75,6 +75,7 @@ def main():
                           sessionId=sessionId,
                           cpuCores=cpuCores)
     lossHistory = LossHistory(sessionId=sessionId)
+    batchHistory = BatchHistory(sessionId=sessionId)
     earlyStopper = EarlyStopping(monitor="val_acc", patience=10)
     checkpointFileName = "checkpoints/weights_" + sessionId + ".hdf5"
     checkpointer = ModelCheckpoint(filepath=checkpointFileName, monitor="val_acc", verbose=1, save_best_only=True)
@@ -82,7 +83,7 @@ def main():
                                   steps_per_epoch=dataGenerator.getTrainStepsPerEpoch(),
                                   epochs=trainingEpoch,
                                   verbose=1,
-                                  callbacks=[earlyStopper, checkpointer],
+                                  callbacks=[batchHistory, earlyStopper, checkpointer],
                                   validation_data=dataGenerator.generateValidation(),
                                   validation_steps=dataGenerator.getValidationSteps())
     historyFilePath = recordFilePath + "history_" + sessionId + ".json"

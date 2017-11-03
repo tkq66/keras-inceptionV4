@@ -71,3 +71,27 @@ class LossHistory(Callback):
         with open(self.accPerBatchOutFileName, "a") as fileHandle:
             fileHandle.write(str(acc) + "\n")
         print("Validation loss: {}, acc: {} - {}\n".format(loss, acc, datetime.datetime.now()))
+
+
+class BatchHistory(Callback):
+
+    def __init__(self,
+                 outputFileLocation="records/",
+                 sessionId="",
+                 lossPerBatchOutFileName="val-loss-batch",
+                 accPerBatchOutFileName="val-acc-batch"):
+        self.sessionId = sessionId
+        self.lossPerBatchOutFileName = outputFileLocation + lossPerBatchOutFileName + "_" + sessionId + ".txt"
+        self.accPerBatchOutFileName = outputFileLocation + accPerBatchOutFileName + "_" + sessionId + ".txt"
+
+    def getSessionId(self):
+        return self.sessionId
+
+    def on_batch_end(self, batch, logs={}):
+        loss = logs["loss"]
+        acc = logs["acc"]
+        with open(self.lossPerBatchOutFileName, "a") as fileHandle:
+            fileHandle.write(str(loss) + "\n")
+        with open(self.accPerBatchOutFileName, "a") as fileHandle:
+            fileHandle.write(str(acc) + "\n")
+        print("\n")
