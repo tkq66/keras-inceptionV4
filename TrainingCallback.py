@@ -56,8 +56,8 @@ class LossHistory(Callback):
     def getSessionId(self):
         return self.sessionId
 
-    def on_train_begin(self, logs={}):
-        return
+    def on_batch_begin(self, batch, logs={}):
+        print("\nBatch {}: Begin Processing - {}".format(batch, datetime.datetime.now()))
 
     def on_batch_end(self, batch, logs={}):
         loss = logs["loss"]
