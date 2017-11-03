@@ -87,3 +87,6 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+# Keras Checkpoints
+checkpoints/*.hdf5
