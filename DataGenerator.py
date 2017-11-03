@@ -9,23 +9,23 @@ from ThreadSafe import threadsafe_generator
 
 class DataGenerator:
 
-    TRAIN_FILE_NAME = '../../data/train_overfit.csv'
-    IMG_FILE_PATH_ROOT = '../../data/transferred_train/'
-
     def __init__(self,
                  validation_split=0.33,
                  num_classes=132,
                  batch_size=32,
                  shuffle=True,
-                 sample=-1):
+                 trainFileName="../../data/train_overfit.csv",
+                 imgFilePathRoot="../../data/transferred_train/"):
         self.validation_split = validation_split
         self.num_classes = num_classes
         self.batch_size = batch_size
         self.shuffle = shuffle
+        self.trainFileName = trainFileName
+        self.imgFilePathRoot = imgFilePathRoot
 
         # Load the training data file for reference on all training file name and class
         self.trainingDataReference = []
-        with open(self.TRAIN_FILE_NAME, newline='') as fileHandle:
+        with open(self.trainFileName, newline='') as fileHandle:
             reader = csv.reader(fileHandle)
             reader.__next__()
             for fileName, label in reader:
@@ -35,8 +35,8 @@ class DataGenerator:
 
         # Pick the indices for the training and validation data set
         totalInput = len(self.trainingDataReference)
-        self.totalTrainInput = int(np.floor(totalInput * validation_split))
-        self.totalValidationInput = totalInput - self.totalTrainInput
+        self.totalValidationInput = int(np.floor(totalInput * validation_split))
+        self.totalTrainInput = totalInput - self.totalValidationInput
         inputIndices = self.__getDataOrder(totalInput)
         validationIndicesOrder = np.random.choice(totalInput, self.totalValidationInput, replace=False)
         self.validationIndices = inputIndices[validationIndicesOrder]
@@ -92,7 +92,7 @@ class DataGenerator:
                            num_classes=self.num_classes)
         for i in order:
             fileName, label = self.trainingDataReference[i]
-            fullFileName = self.IMG_FILE_PATH_ROOT + fileName
+            fullFileName = self.imgFilePathRoot + fileName
             image = self.__get_processed_image(fullFileName)
             x.append(image)
         return np.asarray(x), y

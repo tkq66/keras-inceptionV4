@@ -16,18 +16,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+import csv
 import DataGenerator as dg
 from TrainingCallback import BatchEval
+import inception_v4
+import json
 from keras import optimizers
 from keras import losses
 from keras.callbacks import ModelCheckpoint
-import inception_v4
-import csv
 import uuid
 
 
 # If you want to use a GPU set its index here
-trainingLabelFileName = '../../data/train_overfit.csv'
+trainingLabelFileName = "../../data/train.csv"
+imgFilePathRoot = "../../data/transferred_train/"
+recordFilePath = "records/"
 cpuCores = 4
 trainingEpoch = 1
 batchSize = 32
@@ -46,11 +49,14 @@ def trainingLabelGenerator(labelFileName):
 
 
 def main():
+    sessionId = str(uuid.uuid4())
     classes = len({i[1] for i in trainingLabelGenerator(trainingLabelFileName)})
     dataGenerator = dg.DataGenerator(validation_split=validationPercentage,
                                      num_classes=classes,
                                      batch_size=batchSize,
-                                     shuffle=True)
+                                     shuffle=True,
+                                     trainFileName=trainingLabelFileName,
+                                     imgFilePathRoot=imgFilePathRoot)
 
     # Create model and load pre-trained weights
     model = inception_v4.create_model(num_classes=classes,
@@ -65,8 +71,10 @@ def main():
     # Train the new model
     batchEval = BatchEval(validationGenerator=dataGenerator.generateValidation,
                           validationSteps=dataGenerator.getValidationSteps(),
+                          outputFileLocation=recordFilePath,
+                          sessionId=sessionId,
                           cpuCores=cpuCores)
-    checkpointFileName = "checkpoints/weights_" + str(uuid.uuid4()) + ".hdf5"
+    checkpointFileName = "checkpoints/weights_" + sessionId + ".hdf5"
     checkpointer = ModelCheckpoint(filepath=checkpointFileName, verbose=1, save_best_only=True)
     history = model.fit_generator(generator=dataGenerator.generateTrain(),
                                   steps_per_epoch=dataGenerator.getTrainStepsPerEpoch(),
@@ -77,7 +85,9 @@ def main():
                                   validation_steps=dataGenerator.getValidationSteps(),
                                   workers=cpuCores,
                                   use_multiprocessing=True)
-    print(history)
+    historyFilePath = recordFilePath + "history_" + sessionId + ".json"
+    with open(historyFilePath, "w") as fp:
+        json.dumps(history.history, fp)
 
 
 if __name__ == "__main__":
