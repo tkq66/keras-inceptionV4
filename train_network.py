@@ -33,7 +33,7 @@ imgFilePathRoot = "../../data/transferred_train/"
 recordFilePath = "records/"
 cpuCores = 8
 trainingEpoch = 1
-batchSize = 4
+batchSize = 2
 validationPercentage = 0.2
 momentum = 0.9
 optimizer = optimizers.SGD(momentum=momentum, nesterov=True)
