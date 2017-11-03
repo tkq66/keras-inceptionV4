@@ -26,11 +26,11 @@ class BatchEval(Callback):
         return
 
     def on_batch_begin(self, batch, logs={}):
-        print(f"\nBatch {batch}: Begin Processing - {datetime.datetime.now()}")
+        print("\nBatch {}: Begin Processing - {}".format(batch, datetime.datetime.now()))
 
     def on_batch_end(self, batch, logs={}):
-        print(f"Batch {batch}: End Processing - {datetime.datetime.now()}")
-        print(f"Batch {batch}: Begin Evaluation - {datetime.datetime.now()}")
+        print("Batch {}: End Processing - {}".format(batch, datetime.datetime.now()))
+        print("Batch {}: Begin Evaluation - {}".format(batch, datetime.datetime.now()))
         loss, acc = self.model.evaluate_generator(generator=self.validationGenerator(),
                                                   steps=self.validationSteps,
                                                   workers=self.cpuCores,
@@ -39,7 +39,7 @@ class BatchEval(Callback):
             fileHandle.write(str(loss) + "\n")
         with open(self.accPerBatchOutFileName, "a") as fileHandle:
             fileHandle.write(str(acc) + "\n")
-        print(f"Validation loss: {loss}, acc: {acc} - {datetime.datetime.now()}\n")
+        print("Validation loss: {}, acc: {} - {datetime.datetime.now()}\n".format(loss, acc))
 
 
 class LossHistory(Callback):
