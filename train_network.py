@@ -81,7 +81,7 @@ def main():
     history = model.fit_generator(generator=dataGenerator.generateTrain(),
                                   steps_per_epoch=dataGenerator.getTrainStepsPerEpoch(),
                                   epochs=trainingEpoch,
-                                  verbose=1,
+                                  verbose=2,
                                   callbacks=[earlyStopper, checkpointer],
                                   validation_data=dataGenerator.generateValidation(),
                                   validation_steps=dataGenerator.getValidationSteps())
