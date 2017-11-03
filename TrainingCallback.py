@@ -31,10 +31,12 @@ class BatchEval(Callback):
     def on_batch_end(self, batch, logs={}):
         print("Batch {}: End Processing - {}".format(batch, datetime.datetime.now()))
         print("Batch {}: Begin Evaluation - {}".format(batch, datetime.datetime.now()))
+        # loss, acc = self.model.evaluate_generator(generator=self.validationGenerator(),
+        #                                           steps=self.validationSteps,
+        #                                           workers=self.cpuCores,
+        #                                           use_multiprocessing=True)
         loss, acc = self.model.evaluate_generator(generator=self.validationGenerator(),
-                                                  steps=self.validationSteps,
-                                                  workers=self.cpuCores,
-                                                  use_multiprocessing=True)
+                                                  steps=self.validationSteps)
         with open(self.lossPerBatchOutFileName, "a") as fileHandle:
             fileHandle.write(str(loss) + "\n")
         with open(self.accPerBatchOutFileName, "a") as fileHandle:

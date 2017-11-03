@@ -33,7 +33,7 @@ imgFilePathRoot = "../../data/transferred_train/"
 recordFilePath = "records/"
 cpuCores = 8
 trainingEpoch = 1
-batchSize = 2
+batchSize = 16
 validationPercentage = 0.2
 momentum = 0.9
 optimizer = optimizers.SGD(momentum=momentum, nesterov=True)
@@ -69,11 +69,11 @@ def main():
                   metrics=['accuracy'])
 
     # Train the new model
-    # batchEval = BatchEval(validationGenerator=dataGenerator.generateValidation,
-    #                       validationSteps=dataGenerator.getValidationSteps(),
-    #                       outputFileLocation=recordFilePath,
-    #                       sessionId=sessionId,
-    #                       cpuCores=cpuCores)
+    batchEval = BatchEval(validationGenerator=dataGenerator.generateValidation,
+                          validationSteps=dataGenerator.getValidationSteps(),
+                          outputFileLocation=recordFilePath,
+                          sessionId=sessionId,
+                          cpuCores=cpuCores)
     lossHistory = LossHistory(sessionId=sessionId)
     checkpointFileName = "checkpoints/weights_" + sessionId + ".hdf5"
     checkpointer = ModelCheckpoint(filepath=checkpointFileName, verbose=1, save_best_only=True)
@@ -81,11 +81,9 @@ def main():
                                   steps_per_epoch=dataGenerator.getTrainStepsPerEpoch(),
                                   epochs=trainingEpoch,
                                   verbose=1,
-                                  callbacks=[lossHistory, checkpointer],
+                                  callbacks=[batchEval, checkpointer],
                                   validation_data=dataGenerator.generateValidation(),
-                                  validation_steps=dataGenerator.getValidationSteps(),
-                                  workers=cpuCores,
-                                  use_multiprocessing=True)
+                                  validation_steps=dataGenerator.getValidationSteps())
     historyFilePath = recordFilePath + "history_" + sessionId + ".json"
     with open(historyFilePath, "w") as fp:
         json.dumps(history.history, fp)
