@@ -39,13 +39,33 @@ class BatchEval(Callback):
             fileHandle.write(str(loss) + "\n")
         with open(self.accPerBatchOutFileName, "a") as fileHandle:
             fileHandle.write(str(acc) + "\n")
-        print("Validation loss: {}, acc: {} - {datetime.datetime.now()}\n".format(loss, acc))
+        print("Validation loss: {}, acc: {} - {}\n".format(loss, acc, datetime.datetime.now()))
 
 
 class LossHistory(Callback):
 
+    def __init__(self,
+                 outputFileLocation="records/",
+                 sessionId="",
+                 lossPerBatchOutFileName="val-loss-batch",
+                 accPerBatchOutFileName="val-acc-batch"):
+        self.sessionId = sessionId
+        self.lossPerBatchOutFileName = outputFileLocation + lossPerBatchOutFileName + "_" + sessionId + ".txt"
+        self.accPerBatchOutFileName = outputFileLocation + accPerBatchOutFileName + "_" + sessionId + ".txt"
+
+    def getSessionId(self):
+        return self.sessionId
+
     def on_train_begin(self, logs={}):
-        self.losses = []
+        return
 
     def on_batch_end(self, batch, logs={}):
-        self.losses.append(logs.get('loss'))
+        loss = logs["loss"]
+        acc = logs["acc"]
+        print("Batch {}: End Processing - {}".format(batch, datetime.datetime.now()))
+        print("Batch {}: Begin Evaluation - {}".format(batch, datetime.datetime.now()))
+        with open(self.lossPerBatchOutFileName, "a") as fileHandle:
+            fileHandle.write(str(loss) + "\n")
+        with open(self.accPerBatchOutFileName, "a") as fileHandle:
+            fileHandle.write(str(acc) + "\n")
+        print("Validation loss: {}, acc: {} - {}\n".format(loss, acc, datetime.datetime.now()))

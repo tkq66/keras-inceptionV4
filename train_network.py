@@ -18,7 +18,7 @@ limitations under the License.
 
 import csv
 import DataGenerator as dg
-from TrainingCallback import BatchEval
+from TrainingCallback import BatchEval, LossHistory
 import inception_v4
 import json
 from keras import optimizers
@@ -69,18 +69,19 @@ def main():
                   metrics=['accuracy'])
 
     # Train the new model
-    batchEval = BatchEval(validationGenerator=dataGenerator.generateValidation,
-                          validationSteps=dataGenerator.getValidationSteps(),
-                          outputFileLocation=recordFilePath,
-                          sessionId=sessionId,
-                          cpuCores=cpuCores)
+    # batchEval = BatchEval(validationGenerator=dataGenerator.generateValidation,
+    #                       validationSteps=dataGenerator.getValidationSteps(),
+    #                       outputFileLocation=recordFilePath,
+    #                       sessionId=sessionId,
+    #                       cpuCores=cpuCores)
+    lossHistory = LossHistory(sessionId=sessionId)
     checkpointFileName = "checkpoints/weights_" + sessionId + ".hdf5"
     checkpointer = ModelCheckpoint(filepath=checkpointFileName, verbose=1, save_best_only=True)
     history = model.fit_generator(generator=dataGenerator.generateTrain(),
                                   steps_per_epoch=dataGenerator.getTrainStepsPerEpoch(),
                                   epochs=trainingEpoch,
                                   verbose=1,
-                                  callbacks=[batchEval, checkpointer],
+                                  callbacks=[lossHistory, checkpointer],
                                   validation_data=dataGenerator.generateValidation(),
                                   validation_steps=dataGenerator.getValidationSteps(),
                                   workers=cpuCores,
