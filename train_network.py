@@ -88,7 +88,7 @@ def main():
     x, y = dataGenerator.loadTrain()
     history = model.fit(x=x,
                         y=y,
-                        batchSize=batchSize,
+                        batch_size=batchSize,
                         epochs=trainingEpoch,
                         verbose=1,
                         callbacks=[batchHistory, checkpointer],
