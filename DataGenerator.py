@@ -105,11 +105,11 @@ class DataGenerator:
         if verbose:
             print("Loading input data...")
             x = np.empty([len(order)] + self.imShape)
-            for j in tqdm(range(order)):
+            for j in tqdm(range(len(order))):
                 i = order[j]
                 x[i] = self.__getImageFromDataReference(self.trainingDataReference[i])
             print("Loading data label...")
-            allLabels = [self.trainingDataReference[order[i]][1] for i in tqdm(range(order))]
+            allLabels = [self.trainingDataReference[order[i]][1] for i in tqdm(range(len(order)))]
             print("One-hot encoding labels...")
             y = to_categorical(allLabels, num_classes=self.num_classes)
             print("Finished loading.")
