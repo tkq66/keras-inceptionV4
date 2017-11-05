@@ -78,14 +78,26 @@ class BatchHistory(Callback):
     def __init__(self,
                  outputFileLocation="records/",
                  sessionId="",
-                 lossPerBatchOutFileName="val-loss-batch",
-                 accPerBatchOutFileName="val-acc-batch"):
+                 lossPerEpochOutFileName="val-loss-epoch",
+                 accPerEpochOutFileName="val-acc-epoch",
+                 lossPerBatchOutFileName="loss-batch",
+                 accPerBatchOutFileName="acc-batch"):
         self.sessionId = sessionId
         self.lossPerBatchOutFileName = outputFileLocation + lossPerBatchOutFileName + "_" + sessionId + ".txt"
         self.accPerBatchOutFileName = outputFileLocation + accPerBatchOutFileName + "_" + sessionId + ".txt"
+        self.lossPerEpochOutFileName = outputFileLocation + lossPerEpochOutFileName + "_" + sessionId + ".txt"
+        self.accPerEpochOutFileName = outputFileLocation + accPerEpochOutFileName + "_" + sessionId + ".txt"
 
     def getSessionId(self):
         return self.sessionId
+
+    def on_epoch_end(self, epoch, logs={}):
+        loss = logs["val_loss"]
+        acc = logs["val_acc"]
+        with open(self.lossPerEpochOutFileName, "a") as fileHandle:
+            fileHandle.write(str(loss) + "\n")
+        with open(self.accPerEpochOutFileName, "a") as fileHandle:
+            fileHandle.write(str(acc) + "\n")
 
     def on_batch_end(self, batch, logs={}):
         loss = logs["loss"]
