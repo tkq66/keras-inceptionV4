@@ -312,6 +312,9 @@ def inception_v4(num_classes, dropout_keep_prob, weights, include_top):
             return newModel
         else:
             return model
+    else:
+        model.load_weights(weights_path, by_name=True)
+        return model
 
 
 def create_model(num_classes=1001, dropout_prob=0.2, weights=None, include_top=True):
