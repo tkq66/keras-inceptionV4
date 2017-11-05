@@ -102,7 +102,7 @@ class DataGenerator:
         x = [self.__getImageFromDataReference(self.trainingDataReference[i]) for i in order]
         y = to_categorical([self.trainingDataReference[i][1] for i in order],
                            num_classes=self.num_classes)
-        return np.asarray(x), y
+        return x, y
 
     def __getImageFromDataReference(self, dataReference):
         fileName, label = dataReference
