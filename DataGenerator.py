@@ -37,10 +37,10 @@ class DataGenerator:
         totalInput = len(self.trainingDataReference)
         self.totalValidationInput = int(np.floor(totalInput * validation_split))
         self.totalTrainInput = totalInput - self.totalValidationInput
-        inputIndices = self.__getDataOrder(totalInput)
+        self.allIndices = self.__getDataOrder(totalInput)
         validationIndicesOrder = np.random.choice(totalInput, self.totalValidationInput, replace=False)
-        self.validationIndices = inputIndices[validationIndicesOrder]
-        self.trainIndices = np.delete(inputIndices, validationIndicesOrder)
+        self.validationIndices = self.allIndices[validationIndicesOrder]
+        self.trainIndices = np.delete(self.allIndices, validationIndicesOrder)
         assert len(self.validationIndices) == self.totalValidationInput
         assert len(self.trainIndices) == self.totalTrainInput
 
@@ -68,6 +68,18 @@ class DataGenerator:
     def getValidationSize(self):
         return self.totalValidationInput
 
+    def loadAll(self):
+        x, y = self.__getData(self.allIndices)
+        return tuple((x, y))
+
+    def loadTrain(self):
+        x, y = self.__getData(self.trainIndices)
+        return tuple((x, y))
+
+    def loadValidation(self):
+        x, y = self.__getData(self.validationIndices)
+        return tuple((x, y))
+
     @threadsafe_generator
     def generateTrain(self):
         while True:
@@ -87,15 +99,16 @@ class DataGenerator:
                 yield tuple((x, y))
 
     def __getData(self, order):
-        x = []
+        x = [self.__getImageFromDataReference(self.trainingDataReference[i]) for i in order]
         y = to_categorical([self.trainingDataReference[i][1] for i in order],
                            num_classes=self.num_classes)
-        for i in order:
-            fileName, label = self.trainingDataReference[i]
-            fullFileName = self.imgFilePathRoot + fileName
-            image = self.__get_processed_image(fullFileName)
-            x.append(image)
         return np.asarray(x), y
+
+    def __getImageFromDataReference(self, dataReference):
+        fileName, label = self.dataReference
+        fullFileName = self.imgFilePathRoot + fileName
+        image = self.__get_processed_image(fullFileName)
+        return image
 
     def __getDataOrder(self, totalItems):
         indices = np.arange(totalItems)

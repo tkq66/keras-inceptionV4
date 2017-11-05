@@ -24,6 +24,7 @@ import json
 from keras import optimizers
 from keras import losses
 from keras.callbacks import ModelCheckpoint, EarlyStopping
+from sys import argv
 import uuid
 
 
@@ -35,8 +36,10 @@ cpuCores = 16
 trainingEpoch = 200
 batchSize = 16
 validationPercentage = 0.2
+learningRate = 0.5
 momentum = 0.9
-optimizer = optimizers.SGD(momentum=momentum, nesterov=True)
+dropoutProb = 0.5
+optimizer = optimizers.SGD(lr=learningRate, momentum=momentum, nesterov=True)
 loss = losses.categorical_crossentropy
 
 
@@ -49,6 +52,8 @@ def trainingLabelGenerator(labelFileName):
 
 
 def main():
+    weightName = argv[1]
+    includeTop = True if weightName != 'imagenet' else False
     sessionId = str(uuid.uuid4())
     classes = len({i[1] for i in trainingLabelGenerator(trainingLabelFileName)})
     dataGenerator = dg.DataGenerator(validation_split=validationPercentage,
@@ -60,8 +65,9 @@ def main():
 
     # Create model and load pre-trained weights
     model = inception_v4.create_model(num_classes=classes,
-                                      weights='imagenet',
-                                      include_top=False)
+                                      dropout_prob=dropoutProb,
+                                      weights=weightName,
+                                      include_top=includeTop)
 
     # Configure training hyper-parameters
     model.compile(optimizer=optimizer,
@@ -69,23 +75,32 @@ def main():
                   metrics=['accuracy'])
 
     # Train the new model
-    batchEval = BatchEval(validationGenerator=dataGenerator.generateValidation,
-                          validationSteps=dataGenerator.getValidationSteps(),
-                          outputFileLocation=recordFilePath,
-                          sessionId=sessionId,
-                          cpuCores=cpuCores)
-    lossHistory = LossHistory(sessionId=sessionId)
+    # batchEval = BatchEval(validationGenerator=dataGenerator.generateValidation,
+    #                       validationSteps=dataGenerator.getValidationSteps(),
+    #                       outputFileLocation=recordFilePath,
+    #                       sessionId=sessionId,
+    #                       cpuCores=cpuCores)
+    # lossHistory = LossHistory(sessionId=sessionId)
     batchHistory = BatchHistory(sessionId=sessionId)
-    earlyStopper = EarlyStopping(monitor="val_acc", patience=10)
+    # earlyStopper = EarlyStopping(monitor="val_acc", patience=10)
     checkpointFileName = "checkpoints/weights_" + sessionId + ".hdf5"
     checkpointer = ModelCheckpoint(filepath=checkpointFileName, monitor="val_acc", verbose=1, save_best_only=True)
-    history = model.fit_generator(generator=dataGenerator.generateTrain(),
-                                  steps_per_epoch=dataGenerator.getTrainStepsPerEpoch(),
-                                  epochs=trainingEpoch,
-                                  verbose=1,
-                                  callbacks=[batchHistory, earlyStopper, checkpointer],
-                                  validation_data=dataGenerator.generateValidation(),
-                                  validation_steps=dataGenerator.getValidationSteps())
+    x, y = dataGenerator.loadTrain()
+    history = model.fit(x=x,
+                        y=y,
+                        batchSize=batchSize,
+                        epochs=trainingEpoch,
+                        verbose=1,
+                        callbacks=[batchHistory, checkpointer],
+                        validation_split=validationPercentage,
+                        shuffle=True)
+    # history = model.fit_generator(generator=dataGenerator.generateTrain(),
+    #                               steps_per_epoch=dataGenerator.getTrainStepsPerEpoch(),
+    #                               epochs=trainingEpoch,
+    #                               verbose=1,
+    #                               callbacks=[batchHistory, checkpointer],
+    #                               validation_data=dataGenerator.generateValidation(),
+    #                               validation_steps=dataGenerator.getValidationSteps())
     historyFilePath = recordFilePath + "history_" + sessionId + ".json"
     with open(historyFilePath, "w") as fp:
         json.dumps(history.history, fp)
