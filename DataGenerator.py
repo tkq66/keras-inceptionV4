@@ -56,6 +56,8 @@ class DataGenerator:
                                     (np.tile(np.array([0, self.batch_size]), self.validationSteps).reshape(-1, 2))
         self.validationBatchOrder[-1, 1] = self.totalValidationInput
 
+        self.imShape = [3, 299, 299] if K.image_data_format() == "channels_first" else [299, 299, 3]
+
     def getTrainStepsPerEpoch(self):
         return self.stepsPerEpoch
 
@@ -99,7 +101,9 @@ class DataGenerator:
                 yield tuple((x, y))
 
     def __getData(self, order):
-        x = [self.__getImageFromDataReference(self.trainingDataReference[i]) for i in order]
+        x = np.empty([len(order)] + self.imShape)
+        for i in range(order):
+            x[i] = self.__getImageFromDataReference(self.trainingDataReference[i])
         y = to_categorical([self.trainingDataReference[i][1] for i in order],
                            num_classes=self.num_classes)
         return x, y
