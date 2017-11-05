@@ -75,23 +75,32 @@ def main():
                   metrics=['accuracy'])
 
     # Train the new model
-    batchEval = BatchEval(validationGenerator=dataGenerator.generateValidation,
-                          validationSteps=dataGenerator.getValidationSteps(),
-                          outputFileLocation=recordFilePath,
-                          sessionId=sessionId,
-                          cpuCores=cpuCores)
-    lossHistory = LossHistory(sessionId=sessionId)
+    # batchEval = BatchEval(validationGenerator=dataGenerator.generateValidation,
+    #                       validationSteps=dataGenerator.getValidationSteps(),
+    #                       outputFileLocation=recordFilePath,
+    #                       sessionId=sessionId,
+    #                       cpuCores=cpuCores)
+    # lossHistory = LossHistory(sessionId=sessionId)
     batchHistory = BatchHistory(sessionId=sessionId)
-    earlyStopper = EarlyStopping(monitor="val_acc", patience=10)
+    # earlyStopper = EarlyStopping(monitor="val_acc", patience=10)
     checkpointFileName = "checkpoints/weights_" + sessionId + ".hdf5"
     checkpointer = ModelCheckpoint(filepath=checkpointFileName, monitor="val_acc", verbose=1, save_best_only=True)
-    history = model.fit_generator(generator=dataGenerator.generateTrain(),
-                                  steps_per_epoch=dataGenerator.getTrainStepsPerEpoch(),
-                                  epochs=trainingEpoch,
-                                  verbose=1,
-                                  callbacks=[batchHistory, checkpointer],
-                                  validation_data=dataGenerator.generateValidation(),
-                                  validation_steps=dataGenerator.getValidationSteps())
+    x, y = dataGenerator.loadTrain()
+    history = model.fit(x=x,
+                        y=y,
+                        batchSize=batchSize,
+                        epochs=trainingEpoch,
+                        verbose=1,
+                        callbacks=[batchHistory, checkpointer],
+                        validation_split=validationPercentage,
+                        shuffle=True)
+    # history = model.fit_generator(generator=dataGenerator.generateTrain(),
+    #                               steps_per_epoch=dataGenerator.getTrainStepsPerEpoch(),
+    #                               epochs=trainingEpoch,
+    #                               verbose=1,
+    #                               callbacks=[batchHistory, checkpointer],
+    #                               validation_data=dataGenerator.generateValidation(),
+    #                               validation_steps=dataGenerator.getValidationSteps())
     historyFilePath = recordFilePath + "history_" + sessionId + ".json"
     with open(historyFilePath, "w") as fp:
         json.dumps(history.history, fp)
