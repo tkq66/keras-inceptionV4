@@ -105,7 +105,7 @@ class DataGenerator:
         return np.asarray(x), y
 
     def __getImageFromDataReference(self, dataReference):
-        fileName, label = self.dataReference
+        fileName, label = dataReference
         fullFileName = self.imgFilePathRoot + fileName
         image = self.__get_processed_image(fullFileName)
         return image
