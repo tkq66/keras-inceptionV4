@@ -313,7 +313,7 @@ def inception_v4(num_classes, dropout_keep_prob, weights, include_top):
         else:
             return model
     else:
-        model.load_weights(weights_path, by_name=True)
+        model.load_weights(weights, by_name=True)
         return model
 
 
