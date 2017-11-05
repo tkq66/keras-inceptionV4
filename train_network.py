@@ -85,7 +85,7 @@ def main():
     # earlyStopper = EarlyStopping(monitor="val_acc", patience=10)
     checkpointFileName = "checkpoints/weights_" + sessionId + ".hdf5"
     checkpointer = ModelCheckpoint(filepath=checkpointFileName, monitor="val_acc", verbose=1, save_best_only=True)
-    x, y = dataGenerator.loadAll()
+    x, y = dataGenerator.loadAll(verbose=True)
     history = model.fit(x=x,
                         y=y,
                         batch_size=batchSize,

@@ -5,6 +5,7 @@ from keras import backend as K
 from keras.utils import to_categorical
 import numpy as np
 from ThreadSafe import threadsafe_generator
+from tqdm import tqdm
 
 
 class DataGenerator:
@@ -70,43 +71,56 @@ class DataGenerator:
     def getValidationSize(self):
         return self.totalValidationInput
 
-    def loadAll(self):
-        x, y = self.__getData(self.allIndices)
+    def loadAll(self, verbose=False):
+        x, y = self.__getData(self.allIndices, verbose)
         return tuple((x, y))
 
-    def loadTrain(self):
-        x, y = self.__getData(self.trainIndices)
+    def loadTrain(self, verbose=False):
+        x, y = self.__getData(self.trainIndices, verbose)
         return tuple((x, y))
 
-    def loadValidation(self):
-        x, y = self.__getData(self.validationIndices)
+    def loadValidation(self, verbose=False):
+        x, y = self.__getData(self.validationIndices, verbose)
         return tuple((x, y))
 
     @threadsafe_generator
-    def generateTrain(self):
+    def generateTrain(self, verbose=False):
         while True:
             if self.shuffle:
                 np.random.shuffle(self.trainIndices)
             for begin, end in self.trainBatchOrder:
                 batchOrder = self.trainIndices[begin:end]
-                x, y = self.__getData(batchOrder)
+                x, y = self.__getData(batchOrder, verbose)
                 yield tuple((x, y))
 
     @threadsafe_generator
-    def generateValidation(self):
+    def generateValidation(self, verbose=False):
         while True:
             for begin, end in self.validationBatchOrder:
                 batchOrder = self.validationIndices[begin:end]
-                x, y = self.__getData(batchOrder)
+                x, y = self.__getData(batchOrder, verbose)
                 yield tuple((x, y))
 
-    def __getData(self, order):
-        x = np.empty([len(order)] + self.imShape)
-        for i in range(order):
-            x[i] = self.__getImageFromDataReference(self.trainingDataReference[i])
-        y = to_categorical([self.trainingDataReference[i][1] for i in order],
-                           num_classes=self.num_classes)
-        return x, y
+    def __getData(self, order, verbose=False):
+        if verbose:
+            print("Loading input data...")
+            x = np.empty([len(order)] + self.imShape)
+            for j in tqdm(range(order)):
+                i = order[j]
+                x[i] = self.__getImageFromDataReference(self.trainingDataReference[i])
+            print("Loading data label...")
+            allLabels = [self.trainingDataReference[order[i]][1] for i in tqdm(range(order))]
+            print("One-hot encoding labels...")
+            y = to_categorical(allLabels, num_classes=self.num_classes)
+            print("Finished loading.")
+            return x, y
+        else:
+            x = np.empty([len(order)] + self.imShape)
+            for i in order:
+                x[i] = self.__getImageFromDataReference(self.trainingDataReference[i])
+            y = to_categorical([self.trainingDataReference[i][1] for i in order],
+                               num_classes=self.num_classes)
+            return x, y
 
     def __getImageFromDataReference(self, dataReference):
         fileName, label = dataReference
