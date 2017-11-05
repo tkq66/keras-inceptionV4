@@ -90,3 +90,7 @@ ENV/
 
 # Keras Checkpoints
 checkpoints/*.hdf5
+records/*
+
+# Screen logging
+./screenlog.*
