@@ -106,8 +106,7 @@ class DataGenerator:
             print("Loading input data...")
             x = np.empty([len(order)] + self.imShape)
             for j in tqdm(range(len(order))):
-                i = order[j]
-                x[i] = self.__getImageFromDataReference(self.trainingDataReference[i])
+                x[j] = self.__getImageFromDataReference(self.trainingDataReference[order[j]])
             print("Loading data label...")
             allLabels = [self.trainingDataReference[order[i]][1] for i in tqdm(range(len(order)))]
             print("One-hot encoding labels...")

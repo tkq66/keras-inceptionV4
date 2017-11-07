@@ -34,12 +34,13 @@ imgFilePathRoot = "../../data/transferred_train/"
 recordFilePath = "records/"
 cpuCores = 16
 trainingEpoch = 200
-batchSize = 16
+batchSize = 20
 validationPercentage = 0.2
-learningRate = 0.5
+learningRate = 0.1
 momentum = 0.9
-dropoutProb = 0.5
-optimizer = optimizers.SGD(lr=learningRate, momentum=momentum, nesterov=True)
+dropoutProb = 0.8
+optimizer = optimizers.SGD(momentum=momentum, nesterov=True)
+# optimizer = optimizers.Adam()
 loss = losses.categorical_crossentropy
 
 
@@ -85,14 +86,15 @@ def main():
     # earlyStopper = EarlyStopping(monitor="val_acc", patience=10)
     checkpointFileName = "checkpoints/weights_" + sessionId + ".hdf5"
     checkpointer = ModelCheckpoint(filepath=checkpointFileName, monitor="val_acc", verbose=1, save_best_only=True)
-    x, y = dataGenerator.loadAll(verbose=True)
+    x, y = dataGenerator.loadTrain(verbose=True)
+    validationData = dataGenerator.loadValidation(verbose=True)
     history = model.fit(x=x,
                         y=y,
                         batch_size=batchSize,
                         epochs=trainingEpoch,
                         verbose=1,
                         callbacks=[batchHistory, checkpointer],
-                        validation_split=validationPercentage,
+                        validation_data=validationData,
                         shuffle=True)
     # history = model.fit_generator(generator=dataGenerator.generateTrain(),
     #                               steps_per_epoch=dataGenerator.getTrainStepsPerEpoch(),

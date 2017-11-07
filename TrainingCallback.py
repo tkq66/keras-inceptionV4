@@ -99,11 +99,11 @@ class BatchHistory(Callback):
         with open(self.accPerEpochOutFileName, "a") as fileHandle:
             fileHandle.write(str(acc) + "\n")
 
-    def on_batch_end(self, batch, logs={}):
-        loss = logs["loss"]
-        acc = logs["acc"]
-        with open(self.lossPerBatchOutFileName, "a") as fileHandle:
-            fileHandle.write(str(loss) + "\n")
-        with open(self.accPerBatchOutFileName, "a") as fileHandle:
-            fileHandle.write(str(acc) + "\n")
-        print("\n")
+    # def on_batch_end(self, batch, logs={}):
+        # loss = logs["loss"]
+        # acc = logs["acc"]
+        # with open(self.lossPerBatchOutFileName, "a") as fileHandle:
+        #     fileHandle.write(str(loss) + "\n")
+        # with open(self.accPerBatchOutFileName, "a") as fileHandle:
+        #     fileHandle.write(str(acc) + "\n")
+        # print("\n")
