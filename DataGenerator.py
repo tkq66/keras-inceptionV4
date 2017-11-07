@@ -15,7 +15,7 @@ class DataGenerator:
                  num_classes=132,
                  batch_size=32,
                  shuffle=True,
-                 trainFileName="../../data/train_overfit.csv",
+                 trainFileName="../../data/train.csv",
                  imgFilePathRoot="../../data/transferred_train/"):
         self.validation_split = validation_split
         self.num_classes = num_classes
@@ -25,23 +25,51 @@ class DataGenerator:
         self.imgFilePathRoot = imgFilePathRoot
 
         # Load the training data file for reference on all training file name and class
+        classIndexCollection = {}
+        self.classCounter = {}
         self.trainingDataReference = []
         with open(self.trainFileName, newline='') as fileHandle:
             reader = csv.reader(fileHandle)
             reader.__next__()
+            index = 0
             for fileName, label in reader:
                 if int(label) > self.num_classes:
                     raise ValueError("Label is greater than specified number of classes.")
+                self.classCounter[label] = self.classCounter.get(label, 0) + 1
+                if label not in classIndexCollection:
+                    classIndexCollection[label] = []
+                classIndexCollection[label].append(index)
                 self.trainingDataReference.append(tuple((fileName, label)))
+                index += 1
 
         # Pick the indices for the training and validation data set
         totalInput = len(self.trainingDataReference)
         self.totalValidationInput = int(np.floor(totalInput * validation_split))
         self.totalTrainInput = totalInput - self.totalValidationInput
-        self.allIndices = self.__getDataOrder(totalInput)
-        validationIndicesOrder = np.random.choice(totalInput, self.totalValidationInput, replace=False)
-        self.validationIndices = self.allIndices[validationIndicesOrder]
-        self.trainIndices = np.delete(self.allIndices, validationIndicesOrder)
+
+        self.rawInputIndices = np.arange(totalInput)
+
+        # Sample a truly representative validation data
+        count = 1
+        tempValSum = 0
+        samplesPerClass = []
+        for label in self.classCounter:
+            if count < self.num_classes:
+                samplesPerClass.append(int(np.floor(self.classCounter[label] * validation_split)))
+                tempValSum += samplesPerClass[-1]
+            elif count == self.num_classes:
+                samplesPerClass.append(self.totalValidationInput - tempValSum)
+            count += 1
+        np.random.shuffle(samplesPerClass)
+        count = 0
+        self.validationIndices = []
+        for label in classIndexCollection:
+            self.validationIndices += list(np.random.choice(classIndexCollection[label], samplesPerClass[count], replace=False))
+            count += 1
+
+        # Remove the data selected for validation, leaving with training samples
+        self.trainIndices = np.delete(self.rawInputIndices, self.validationIndices)
+
         assert len(self.validationIndices) == self.totalValidationInput
         assert len(self.trainIndices) == self.totalTrainInput
 
@@ -59,6 +87,19 @@ class DataGenerator:
 
         self.imShape = [3, 299, 299] if K.image_data_format() == "channels_first" else [299, 299, 3]
 
+    def getValidationRepresentationError(self):
+        validationClassCounter = {}
+        for i in self.validationIndices:
+            label = self.trainingDataReference[i][1]
+            validationClassCounter[label] = validationClassCounter.get(label, 0) + 1
+        valPercentage = {}
+        for label in validationClassCounter:
+            valPercentage[label] = validationClassCounter[label] / np.floor(self.classCounter[label])
+        error = 0
+        for label in valPercentage:
+            error += (valPercentage[label] - self.validation_split) ** 2
+        return error
+
     def getTrainStepsPerEpoch(self):
         return self.stepsPerEpoch
 
@@ -72,10 +113,14 @@ class DataGenerator:
         return self.totalValidationInput
 
     def loadAll(self, verbose=False):
-        x, y = self.__getData(self.allIndices, verbose)
+        if self.shuffle:
+            np.random.shuffle(self.rawInputIndices)
+        x, y = self.__getData(self.rawInputIndices, verbose)
         return tuple((x, y))
 
     def loadTrain(self, verbose=False):
+        if self.shuffle:
+            np.random.shuffle(self.trainIndices)
         x, y = self.__getData(self.trainIndices, verbose)
         return tuple((x, y))
 
@@ -126,12 +171,6 @@ class DataGenerator:
         fullFileName = self.imgFilePathRoot + fileName
         image = self.__get_processed_image(fullFileName)
         return image
-
-    def __getDataOrder(self, totalItems):
-        indices = np.arange(totalItems)
-        if self.shuffle:
-            np.random.shuffle(indices)
-        return indices
 
     def __get_processed_image(self, img_path):
         # Load image and convert from BGR to RGB
