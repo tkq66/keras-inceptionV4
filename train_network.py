@@ -38,7 +38,7 @@ batchSize = 20
 validationPercentage = 0.2
 learningRate = 0.1
 momentum = 0.9
-dropoutProb = 0.8
+dropoutProb = 0.5
 optimizer = optimizers.SGD(momentum=momentum, nesterov=True)
 # optimizer = optimizers.Adam()
 loss = losses.categorical_crossentropy
