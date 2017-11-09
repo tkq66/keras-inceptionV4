@@ -35,7 +35,7 @@ recordFilePath = "records/"
 cpuCores = 16
 trainingEpoch = 200
 batchSize = 20
-validationPercentage = 0.2
+validationPercentage = 0.0
 learningRate = 0.00001
 momentum = 0.9
 dropoutProb = 0.5
@@ -85,16 +85,15 @@ def main():
     batchHistory = BatchHistory(sessionId=sessionId)
     # earlyStopper = EarlyStopping(monitor="val_acc", patience=10)
     checkpointFileName = "checkpoints/weights_" + sessionId + ".hdf5"
-    checkpointer = ModelCheckpoint(filepath=checkpointFileName, monitor="val_acc", verbose=1, save_best_only=True)
+    checkpointer = ModelCheckpoint(filepath=checkpointFileName, monitor="acc", verbose=1, save_best_only=True)
     x, y = dataGenerator.loadTrain(verbose=True)
-    validationData = dataGenerator.loadValidation(verbose=True)
+    # validationData = dataGenerator.loadValidation(verbose=True)
     history = model.fit(x=x,
                         y=y,
                         batch_size=batchSize,
                         epochs=trainingEpoch,
                         verbose=1,
-                        callbacks=[batchHistory, checkpointer],
-                        validation_data=validationData,
+                        callbacks=[checkpointer],
                         shuffle=True)
     # history = model.fit_generator(generator=dataGenerator.generateTrain(),
     #                               steps_per_epoch=dataGenerator.getTrainStepsPerEpoch(),

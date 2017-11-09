@@ -16,7 +16,7 @@ class DataGenerator:
                  batch_size=32,
                  shuffle=True,
                  trainFileName="../../data/train.csv",
-                 imgFilePathRoot="../../data/transferred_train/",):
+                 imgFilePathRoot="../../data/transferred_train/"):
         self.validation_split = validation_split
         self.num_classes = num_classes
         self.batch_size = batch_size
@@ -80,11 +80,10 @@ class DataGenerator:
         self.trainBatchOrder[-1, 1] = self.totalTrainInput
 
         # Calculate the begin and end index for each validation batch
-        if validation_split > 0:
-            self.validationSteps = int(np.ceil(self.totalValidationInput / self.batch_size))
-            self.validationBatchOrder = (np.repeat(np.arange(self.validationSteps), 2).reshape(-1, 2) * self.batch_size) + \
-                                        (np.tile(np.array([0, self.batch_size]), self.validationSteps).reshape(-1, 2))
-            self.validationBatchOrder[-1, 1] = self.totalValidationInput
+        self.validationSteps = int(np.ceil(self.totalValidationInput / self.batch_size))
+        self.validationBatchOrder = (np.repeat(np.arange(self.validationSteps), 2).reshape(-1, 2) * self.batch_size) + \
+                                    (np.tile(np.array([0, self.batch_size]), self.validationSteps).reshape(-1, 2))
+        self.validationBatchOrder[-1, 1] = self.totalValidationInput
 
         self.imShape = [3, 299, 299] if K.image_data_format() == "channels_first" else [299, 299, 3]
 
