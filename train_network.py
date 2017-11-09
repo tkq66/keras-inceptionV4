@@ -31,15 +31,17 @@ import uuid
 # If you want to use a GPU set its index here
 trainingLabelFileName = "../../data/train.csv"
 imgFilePathRoot = "../../data/transferred_train/"
+testImgFilePathRoot = "../../data/transferred_test/"
+mode = ""
 recordFilePath = "records/"
 cpuCores = 16
 trainingEpoch = 200
 batchSize = 20
 validationPercentage = 0.2
-learningRate = 0.1
+learningRate = 0.00001
 momentum = 0.9
 dropoutProb = 0.5
-optimizer = optimizers.SGD(momentum=momentum, nesterov=True)
+optimizer = optimizers.SGD(lr=learningRate, momentum=momentum, nesterov=True)
 # optimizer = optimizers.Adam()
 loss = losses.categorical_crossentropy
 
@@ -53,7 +55,8 @@ def trainingLabelGenerator(labelFileName):
 
 
 def main():
-    weightName = argv[1]
+    mode = argv[1]
+    weightName = argv[2]
     includeTop = True if weightName != 'imagenet' else False
     sessionId = str(uuid.uuid4())
     classes = len({i[1] for i in trainingLabelGenerator(trainingLabelFileName)})
@@ -75,38 +78,43 @@ def main():
                   loss=loss,
                   metrics=['accuracy'])
 
-    # Train the new model
-    # batchEval = BatchEval(validationGenerator=dataGenerator.generateValidation,
-    #                       validationSteps=dataGenerator.getValidationSteps(),
-    #                       outputFileLocation=recordFilePath,
-    #                       sessionId=sessionId,
-    #                       cpuCores=cpuCores)
-    # lossHistory = LossHistory(sessionId=sessionId)
-    batchHistory = BatchHistory(sessionId=sessionId)
-    # earlyStopper = EarlyStopping(monitor="val_acc", patience=10)
-    checkpointFileName = "checkpoints/weights_" + sessionId + ".hdf5"
-    checkpointer = ModelCheckpoint(filepath=checkpointFileName, monitor="val_acc", verbose=1, save_best_only=True)
-    x, y = dataGenerator.loadTrain(verbose=True)
-    validationData = dataGenerator.loadValidation(verbose=True)
-    history = model.fit(x=x,
-                        y=y,
-                        batch_size=batchSize,
-                        epochs=trainingEpoch,
-                        verbose=1,
-                        callbacks=[batchHistory, checkpointer],
-                        validation_data=validationData,
-                        shuffle=True)
-    # history = model.fit_generator(generator=dataGenerator.generateTrain(),
-    #                               steps_per_epoch=dataGenerator.getTrainStepsPerEpoch(),
-    #                               epochs=trainingEpoch,
-    #                               verbose=1,
-    #                               callbacks=[batchHistory, checkpointer],
-    #                               validation_data=dataGenerator.generateValidation(),
-    #                               validation_steps=dataGenerator.getValidationSteps())
-    historyFilePath = recordFilePath + "history_" + sessionId + ".json"
-    with open(historyFilePath, "w") as fp:
-        json.dumps(history.history, fp)
+    if mode == "train:
 
+        # Train the new model
+        # batchEval = BatchEval(validationGenerator=dataGenerator.generateValidation,
+        #                       validationSteps=dataGenerator.getValidationSteps(),
+        #                       outputFileLocation=recordFilePath,
+        #                       sessionId=sessionId,
+        #                       cpuCores=cpuCores)
+        # lossHistory = LossHistory(sessionId=sessionId)
+        batchHistory = BatchHistory(sessionId=sessionId)
+        # earlyStopper = EarlyStopping(monitor="val_acc", patience=10)
+        checkpointFileName = "checkpoints/weights_" + sessionId + ".hdf5"
+        checkpointer = ModelCheckpoint(filepath=checkpointFileName, monitor="val_acc", verbose=1, save_best_only=True)
+        x, y = dataGenerator.loadTrain(verbose=True)
+        validationData = dataGenerator.loadValidation(verbose=True)
+        history = model.fit(x=x,
+                            y=y,
+                            batch_size=batchSize,
+                            epochs=trainingEpoch,
+                            verbose=1,
+                            callbacks=[batchHistory, checkpointer],
+                            validation_data=validationData,
+                            shuffle=True)
+        # history = model.fit_generator(generator=dataGenerator.generateTrain(),
+        #                               steps_per_epoch=dataGenerator.getTrainStepsPerEpoch(),
+        #                               epochs=trainingEpoch,
+        #                               verbose=1,
+        #                               callbacks=[batchHistory, checkpointer],
+        #                               validation_data=dataGenerator.generateValidation(),
+        #                               validation_steps=dataGenerator.getValidationSteps())
+        historyFilePath = recordFilePath + "history_" + sessionId + ".json"
+        with open(historyFilePath, "w") as fp:
+            json.dumps(history.history, fp)
+    elif mode == "test":
+    
+    else:
+        raise ValueError("Mode not recognized! Please specify either 'train' or 'test'.")
 
 if __name__ == "__main__":
     main()
