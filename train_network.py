@@ -85,7 +85,7 @@ def main():
     batchHistory = BatchHistory(sessionId=sessionId)
     # earlyStopper = EarlyStopping(monitor="val_acc", patience=10)
     checkpointFileName = "checkpoints/weights_" + sessionId + ".hdf5"
-    checkpointer = ModelCheckpoint(filepath=checkpointFileName, monitor="acc", verbose=1, save_best_only=True)
+    checkpointer = ModelCheckpoint(filepath=checkpointFileName, monitor="acc", verbose=1)
     x, y = dataGenerator.loadTrain(verbose=True)
     # validationData = dataGenerator.loadValidation(verbose=True)
     history = model.fit(x=x,
