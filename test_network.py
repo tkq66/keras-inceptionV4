@@ -52,7 +52,7 @@ def main():
                                       include_top=includeTop)
     # Make predictions on the test data
     x = dataGenerator.loadData(verbose=True)
-    results = model.predict(x=x, verose=1)
+    results = model.predict(x=x, verbose=1)
 
     fileNameList = dataGenerator.getFileNameList()
     with open(outFileName, "w") as fp:
