@@ -7,9 +7,9 @@ import tensorflow as tf
 
 in_folder = './data'
 out_folder = './tf-data'
-train_x_folder = os.path.join(in_folder, 'train_images/transferred_train')
+train_x_folder = os.path.join(in_folder, 'train_images')
 train_y_file = os.path.join(in_folder, 'train.csv')
-test_x_folder = os.path.join(in_folder, 'test_images/transferred_test')
+test_x_folder = os.path.join(in_folder, 'test_images')
 
 validation_size = 0.3
 num_shards = 2
