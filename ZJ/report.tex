@@ -1,0 +1,126 @@
+% !TEX TS-program = pdflatex
+% !TEX encoding = UTF-8 Unicode
+
+% This is a simple template for a LaTeX document using the "article" class.
+% See "book", "report", "letter" for other types of document.
+
+\documentclass[11pt]{article} % use larger type; default would be 10pt
+
+\usepackage[utf8]{inputenc} % set input encoding (not needed with XeLaTeX)
+
+%%% Examples of Article customizations
+% These packages are optional, depending whether you want the features they provide.
+% See the LaTeX Companion or other references for full information.
+
+%%% PAGE DIMENSIONS
+\usepackage{geometry} % to change the page dimensions
+\geometry{a4paper} % or letterpaper (US) or a5paper or....
+% \geometry{margin=2in} % for example, change the margins to 2 inches all round
+% \geometry{landscape} % set up the page for landscape
+%   read geometry.pdf for detailed page layout information
+
+\usepackage{graphicx} % support the \includegraphics command and options
+
+% \usepackage[parfill]{parskip} % Activate to begin paragraphs with an empty line rather than an indent
+
+%%% PACKAGES
+\usepackage{booktabs} % for much better looking tables
+\usepackage{array} % for better arrays (eg matrices) in maths
+\usepackage{paralist} % very flexible & customisable lists (eg. enumerate/itemize, etc.)
+\usepackage{verbatim} % adds environment for commenting out blocks of text & for better verbatim
+\usepackage{subfig} % make it possible to include more than one captioned figure/table in a single float
+% These packages are all incorporated in the memoir class to one degree or another...
+
+%%% HEADERS & FOOTERS
+\usepackage{fancyhdr} % This should be set AFTER setting up the page geometry
+\pagestyle{fancy} % options: empty , plain , fancy
+\renewcommand{\headrulewidth}{0pt} % customise the layout...
+\lhead{}\chead{}\rhead{}
+\lfoot{}\cfoot{\thepage}\rfoot{}
+
+%%% SECTION TITLE APPEARANCE
+\usepackage{sectsty}
+\allsectionsfont{\sffamily\mdseries\upshape} % (See the fntguide.pdf for font help)
+% (This matches ConTeXt defaults)
+
+%%% ToC (table of contents) APPEARANCE
+\usepackage[nottoc,notlof,notlot]{tocbibind} % Put the bibliography in the ToC
+\usepackage[titles,subfigure]{tocloft} % Alter the style of the Table of Contents
+\renewcommand{\cftsecfont}{\rmfamily\mdseries\upshape}
+\renewcommand{\cftsecpagefont}{\rmfamily\mdseries\upshape} % No bold!
+
+\usepackage{amsmath}
+
+%%% END Article customizations
+
+%%% The "real" document content comes below...
+
+\title{CS5242 Project Report}
+\author{Teekayu Klongtruajrok, Zheng ZhiJian}
+\date{} % Activate to display a given date or no date (if empty),
+         % otherwise the current date is printed 
+
+\begin{document}
+\maketitle
+
+\section{Accuracy Jump on Restart [Not important, can remove]}
+We used $tf.contrib.metrics.streaming\_accuracy$ to update accuracy. This function seems calculating running average. So the curve is smooth, but lower than actual value because of low values at the begining. When restart, the old values are discarded for calculating the average. See firgure.
+
+\section{Effect of learning rate [Please advice other explanations]}
+We used exponential decay learning rate. Initial learning rate is 0.0002, it is reduced to 70\% every 2 epochs.
+We also tried another setting with initial learning rate of 0.001, reduced to 97\% every 2 epochs. To our surprise, accuracy for the smaller learning rate increases much faster. E.g. after 4 epochs, we got 65\% training accuracy for the smaller learning rate, but only 43\% accuracy for the bigger learning rate.\\
+We suspect it may due to the ADAM optimzer. Smaller learning rate give us more time to accumulate momentum, and thus easier to escape from the local traps.
+
+\section{Network Model Tested}
+\begin{tabular}{|l|l|l|l|}
+	\hline
+	& traing accuracy & validation accuracy & ImageNet Top-1 Accuracy\\ \hline
+	inception v4 & 99.75\% & 87.90\% & 80.2\% \\ \hline
+	inception resnet v2 & 99.73\% & 88.39\% & 80.4\% \\ \hline
+	nasnet large & 84.73\% & 84.12\% & 82.7\% \\
+	 \hline
+\end{tabular}
+
+Our experiement results for Incpetion resnet v2 and inception v4 looks consistent with reported ImageNet accuracy. However, nasnet large doesnot work well on our expriement although it is reported to perform best on ImageNet.
+Perhaps 
+\begin{itemize}
+	\item it doesnot fit our dataset well.
+	\item or maybe we need to finetune the hyperparameters.
+	\item or maybe our implementation is not correct.
+\end{itemize}
+We tested the model again by modifying $slim.train\_image\_classifier.py$ to process our dataset. The hyperparameters are also different from our code. It produces validation result of 82.60\%. With this, we believe our implementation is correct.\\
+As it is much slower to train nasnet large compared to inceptino net (about 4x slower). We give up it and focus on improving the inception resnet v2.
+
+There is a big gap between training accuracy and validation accuracy. A clear indication of overfitting. We have tried the following the aleivate this problem:
+\begin{itemize}
+	\item Regularization.\\
+	We checked tensorflow implementation. Regularization is enabled by default with weight 1.0. Cross entropy loss is about 0.11 while regularization loss is about 0.50. We felt that it seems not meaningful to increase regularization weight.
+	\item Dropout.
+	Default dropout keep probability is 0.8. We reduced it to 0.5. But the result is worse. Then we realized that we may did it wrongly. To save some time, we start from our last trained model (dropout 0.8). But seems the model already 'memorized' our dataset, and it is not 'forgetting' even after we reduce the drop out.
+	\item Reduce network model.
+	This one is a bit complicated to us. We did not have time to explore.
+	\item Freeze bottom layer variables.
+	Low level features are more likely to be reusable. They are trained on ImageNet which has 
+	We tried 4 models: train the top layer only, the last two layers, the last four layers (the repeated inception network is considered as one layer) and the last six layers. The first 3 attempts improves very slowly, we stopped them as we think they suffer from underfitting. The last one improves faster, we are still training it. If it fails, we'll try traing the last 8 layers, i.e. left only the stem freezed.
+	\item Feed more data.\\
+	This should work. Once we fixed the hyperparameters, we can merge the validation set to training set.
+\end{itemize}
+
+\section{Future Work}
+\begin{itemize}
+	\item Reduce network model.
+	This one is a bit complicated to us. We did not have time to explore.
+	\item SGD.
+	Refer to the paper.
+\end{itemize}
+
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[width=1.0\linewidth]{"./plot/acc_jump"}
+	\caption{Accuracy Jump on Restart}
+	\label{n1-ad}
+\end{figure}
+
+
+\end{document}
