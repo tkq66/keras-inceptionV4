@@ -1,5 +1,6 @@
+import sys
+sys.path.insert(0, "./models/research/slim")
 import os
-import numpy as np
 from tensorflow.python.platform import tf_logging as logging
 import time
 import tensorflow as tf

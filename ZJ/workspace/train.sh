@@ -1,3 +1,11 @@
+MODELS_DIR="./models"
+if [ ! -d $MODELS_DIR ]; then
+    mkdir models
+fi
+if [ ! "$(ls -A $DIR)" ]; then
+     git clone https://github.com/tensorflow/models/
+fi
+
 FILE=./tf-data/trainall-0-of-2.tfrecord
 if [ ! -f $FILE ]; then
 	echo "Converting data ..."
