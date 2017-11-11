@@ -2,7 +2,7 @@ MODELS_DIR="./models"
 if [ ! -d $MODELS_DIR ]; then
     mkdir models
 fi
-if [ ! "$(ls -A $DIR)" ]; then
+if [ ! "$(ls -A $MODELS_DIR)" ]; then
      git clone https://github.com/tensorflow/models/
 fi
 
