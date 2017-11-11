@@ -13,12 +13,12 @@ if [ ! -f $FILE ]; then
 	python3 convert_data.py
 fi
 
-FILE=./models/inception_resnet_v2_2016_08_30
+FILE=./checkpoints/inception_resnet_v2_2016_08_30
 if [ ! -f $FILE ]; then
 	wget http://download.tensorflow.org/models/inception_resnet_v2_2016_08_30.tar.gz
-	mkdir models
+	mkdir checkpoints
 	tar -xvf inception_resnet_v2_2016_08_30.tar.gz
-	mv inception_resnet_v2_2016_08_30.ckpt ./models/
+	mv inception_resnet_v2_2016_08_30.ckpt ./checkpoints/
 	rm inception_resnet_v2_2016_08_30.tar.gz
 fi
 
