@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(0, "./models/research/slim")
+sys.path.insert(0, "./tensorflow-slim/models/research/slim/")
 import os
 from tensorflow.python.platform import tf_logging as logging
 import time
@@ -72,21 +72,21 @@ network_map = {
         network_fn=inception.inception_v4,
         arg_scopes=inception.inception_v4_arg_scope,
         preprocess_fn=inception_preprocessing,
-        checkpoint=os.path.join(proj_dir, 'checkpoints/inception_v4.ckpt'),
+        checkpoint=os.path.join(proj_dir, 'models/inception_v4.ckpt'),
         exclude=['InceptionV4/Logits', 'InceptionV4/AuxLogits'],
         batch_size=48),
     'inception_resnet_v2': NetworkInfo(
         network_fn=inception.inception_resnet_v2,
         arg_scopes=inception.inception_resnet_v2_arg_scope,
         preprocess_fn=inception_preprocessing,
-        checkpoint=os.path.join(proj_dir, 'checkpoints/inception_resnet_v2_2016_08_30.ckpt'),
+        checkpoint=os.path.join(proj_dir, 'models/inception_resnet_v2_2016_08_30.ckpt'),
         exclude=['InceptionResnetV2/Logits', 'InceptionResnetV2/AuxLogits'],
         batch_size=32),
     'nasnet_large': NetworkInfo(
         network_fn=nasnet.build_nasnet_large,
         arg_scopes=nasnet.nasnet_large_arg_scope,
         preprocess_fn=inception_preprocessing,
-        checkpoint=os.path.join(proj_dir, 'checkpoints/nasnet-a_large_04_10_2017'),
+        checkpoint=os.path.join(proj_dir, 'models/nasnet-a_large_04_10_2017'),
         exclude=['final_layer/FC', 'aux_11/aux_logits/FC', 'cell_stem_0/comb_iter_0/left/global_step'],
         batch_size=8),
 }
