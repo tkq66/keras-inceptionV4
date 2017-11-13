@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(0, "./tensorflow-slim/models/research/slim/")
+sys.path.insert(0, "./tensorflow-slim/research/slim")
 import os
 from tensorflow.python.platform import tf_logging as logging
 import time
