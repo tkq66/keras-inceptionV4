@@ -1,6 +1,6 @@
-MODELS_DIR="./tesnsorflow-slim"
+MODELS_DIR="./tensorflow-slim"
 if [ ! -d $MODELS_DIR ]; then
-    mkdir models
+    mkdir $MODELS_DIR
 fi
 if [ ! "$(ls -A $MODELS_DIR)" ]; then
      git clone https://github.com/tensorflow/models/ $MODELS_DIR
