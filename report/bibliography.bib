@@ -1,0 +1,68 @@
+@article{Zoph2017,
+abstract = {Developing state-of-the-art image classification models often requires significant architecture engineering and tuning. In this paper, we attempt to reduce the amount of architecture engineering by using Neural Architecture Search to learn an architectural building block on a small dataset that can be transferred to a large dataset. This approach is similar to learning the structure of a recurrent cell within a recurrent network. In our experiments, we search for the best convolutional cell on the CIFAR-10 dataset and then apply this learned cell to the ImageNet dataset by stacking together more of this cell. Although the cell is not learned directly on ImageNet, an architecture constructed from the best learned cell achieves state-of-the-art accuracy of 82.3{\%} top-1 and 96.0{\%} top-5 on ImageNet, which is 0.8{\%} better in top-1 accuracy than the best human-invented architectures while having 9 billion fewer FLOPS. This cell can also be scaled down two orders of magnitude: a smaller network constructed from the best cell also achieves 74{\%} top-1 accuracy, which is 3.1{\%} better than the equivalently-sized, state-of-the-art models for mobile platforms.},
+archivePrefix = {arXiv},
+arxivId = {1707.07012},
+author = {Zoph, Barret and Vasudevan, Vijay and Shlens, Jonathon and Le, Quoc V.},
+eprint = {1707.07012},
+file = {:Users/teekay/Downloads/Grad{\_}School/NUS/Classes/CS5242{\_}-{\_}Deep{\_}Learning/project/Learning Transferable Architectures for Scalable Image Recognition (NASNet) by Zoph.pdf:pdf},
+title = {{Learning Transferable Architectures for Scalable Image Recognition}},
+url = {http://arxiv.org/abs/1707.07012},
+year = {2017}
+}
+@article{Szegedy2016,
+abstract = {Very deep convolutional networks have been central to the largest advances in image recognition performance in recent years. One example is the Inception architecture that has been shown to achieve very good performance at relatively low computational cost. Recently, the introduction of residual connections in conjunction with a more traditional architecture has yielded state-of-the-art performance in the 2015 ILSVRC challenge; its performance was similar to the latest generation Inception-v3 network. This raises the question of whether there are any benefit in combining the Inception architecture with residual connections. Here we give clear empirical evidence that training with residual connections accelerates the training of Inception networks significantly. There is also some evidence of residual Inception networks outperforming similarly expensive Inception networks without residual connections by a thin margin. We also present several new streamlined architectures for both residual and non-residual Inception networks. These variations improve the single-frame recognition performance on the ILSVRC 2012 classification task significantly. We further demonstrate how proper activation scaling stabilizes the training of very wide residual Inception networks. With an ensemble of three residual and one Inception-v4, we achieve 3.08 percent top-5 error on the test set of the ImageNet classification (CLS) challenge},
+archivePrefix = {arXiv},
+arxivId = {1602.07261},
+author = {Szegedy, Christian and Ioffe, Sergey and Vanhoucke, Vincent and Alemi, Alex},
+doi = {10.1016/j.patrec.2014.01.008},
+eprint = {1602.07261},
+file = {:Users/teekay/Downloads/Grad{\_}School/NUS/Classes/CS5242{\_}-{\_}Deep{\_}Learning/project/Inception-v4, Inception-ResNet and the Impact of Residual Connections on Learning by Szegedy.pdf:pdf},
+isbn = {0167-8655},
+issn = {01678655},
+pmid = {23064159},
+title = {{Inception-v4, Inception-ResNet and the Impact of Residual Connections on Learning}},
+url = {http://arxiv.org/abs/1602.07261},
+year = {2016}
+}
+@article{Wilson2017,
+abstract = {Adaptive optimization methods, which perform local optimization with a metric constructed from the history of iterates, are becoming increasingly popular for training deep neural networks. Examples include AdaGrad, RMSProp, and Adam. We show that for simple overparameterized problems, adaptive methods often find drastically different solutions than gradient descent (GD) or stochastic gradient descent (SGD). We construct an illustrative binary classification problem where the data is linearly separable, GD and SGD achieve zero test error, and AdaGrad, Adam, and RMSProp attain test errors arbitrarily close to half. We additionally study the empirical generalization capability of adaptive methods on several state-of-the-art deep learning models. We observe that the solutions found by adaptive methods generalize worse (often significantly worse) than SGD, even when these solutions have better training performance. These results suggest that practitioners should reconsider the use of adaptive methods to train neural networks.},
+archivePrefix = {arXiv},
+arxivId = {1705.08292},
+author = {Wilson, Ashia C. and Roelofs, Rebecca and Stern, Mitchell and Srebro, Nathan and Recht, Benjamin},
+eprint = {1705.08292},
+file = {:Users/teekay/Downloads/Grad{\_}School/NUS/Classes/CS5242{\_}-{\_}Deep{\_}Learning/project/The Marginal Value of Adaptive Gradient Methods in Machine Learning by Wilson.pdf:pdf},
+pages = {1--14},
+title = {{The Marginal Value of Adaptive Gradient Methods in Machine Learning}},
+url = {http://arxiv.org/abs/1705.08292},
+year = {2017}
+}
+@misc{Silberman2017,
+author = {Silberman, Nathan and Guadarrama, Sergio},
+title = {{TensorFlow-Slim image classification model library}},
+howpublished = {\url{https://github.com/tensorflow/models/tree/master/research/slim}},
+urldate = {2017-11-13},
+year = {2017}
+}
+@misc{5ke2017,
+author = {5Ke and danidc},
+title = {{Validation accuracy is always greater than training accuracy in Keras}},
+howpublished = {\url{https://stackoverflow.com/questions/45135551/validation-accuracy-is-always-greater-than-training-accuracy-in-keras}},
+urldate = {2017-11-13},
+year = {2017}
+}
+@article{Chen2016,
+abstract = {Sina Weibo, China's most popular microblogging platform, is currently used by over {\$}500M{\$} users and is considered to be a proxy of Chinese social life. In this study, we contrast the discussions occurring on Sina Weibo and on Chinese language Twitter in order to observe two different strands of Chinese culture: people within China who use Sina Weibo with its government imposed restrictions and those outside that are free to speak completely anonymously. We first propose a simple ad-hoc algorithm to identify topics of Tweets and Weibo. Different from previous works on micro-message topic detection, our algorithm considers topics of the same contents but with different $\backslash${\#}tags. Our algorithm can also detect topics for Tweets and Weibos without any $\backslash${\#}tags. Using a large corpus of Weibo and Chinese language tweets, covering the period from January {\$}1{\$} to December {\$}31{\$}, {\$}2012{\$}, we obtain a list of topics using clustered $\backslash${\#}tags that we can then use to compare the two platforms. Surprisingly, we find that there are no common entries among the Top {\$}100{\$} most popular topics. Furthermore, only {\$}9.2\backslash{\%}{\$} of tweets correspond to the Top {\$}1000{\$} topics on Sina Weibo platform, and conversely only {\$}4.4\backslash{\%}{\$} of weibos were found to discuss the most popular Twitter topics. Our results reveal significant differences in social attention on the two platforms, with most popular topics on Sina Weibo relating to entertainment while most tweets corresponded to cultural or political contents that is practically non existent in Sina Weibo.},
+archivePrefix = {arXiv},
+arxivId = {arXiv:1508.06655v1},
+author = {Chen, Jingjing and Ngo, Chong-wah},
+doi = {10.1145/2964284.2964315},
+eprint = {arXiv:1508.06655v1},
+file = {:Users/teekay/Downloads/Grad{\_}School/NUS/Classes/CS5242{\_}-{\_}Deep{\_}Learning/project/Deep-based Ingredient Recognition for Cooking Recipe Retrieval.pdf:pdf},
+isbn = {9781450336031},
+issn = {9781450321389},
+journal = {Proceedings of the 2016 ACM on Multimedia Conference - MM '16},
+pages = {32--41},
+title = {{Deep-based Ingredient Recognition for Cooking Recipe Retrieval}},
+url = {http://dl.acm.org/citation.cfm?doid=2964284.2964315},
+year = {2016}
+}
